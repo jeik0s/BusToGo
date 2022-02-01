@@ -1,6 +1,7 @@
 import 'package:html/parser.dart';
 import 'networking.dart';
 
+import 'package:bustogo/elements/stand_point.dart';
 import 'package:bustogo/elements/bus_stop.dart';
 
 class DataParser{
@@ -21,9 +22,8 @@ class DataParser{
     return cityNames;
   }
 
-  Future<List<String>> parseBusStops(String cityName) async {
-
-//    List<BusStop> busStops = [];
+  Future<List<BusStop>> parseBusStops(String cityName) async {
+    List<BusStop> allBusStops = [];
 
     List<String> busStops = [];
     int busStopNumber = 0;
@@ -41,20 +41,32 @@ class DataParser{
     int rowNumberInTimesheet = documet.getElementsByClassName('mainsitecols')[0].getElementsByTagName('tr').length;
 //    print(rowNumberInTimesheet);
     for(int i = 2; i<rowNumberInTimesheet; i++){
+      BusStop busStop = BusStop(name: busStops[busStopNumber]);
       try{
         documet.getElementsByTagName('tr')[i].getElementsByTagName('td')[0].getElementsByTagName('small')[0];
-        print(busStops[busStopNumber]);
-        print(documet.getElementsByTagName('tr')[i].getElementsByTagName('td')[0].getElementsByTagName('small')[0].text);
+
+        //print(busStops[busStopNumber]);
+        //print(documet.getElementsByTagName('tr')[i].getElementsByTagName('td')[0].getElementsByTagName('small')[0].text);
+
+        StandPoint standPoint = StandPoint(name: documet.getElementsByTagName('tr')[i].getElementsByTagName('td')[0].getElementsByTagName('small')[0].text);
+
+
         var numbersOfBusesInStandPoint = documet.getElementsByTagName('tr')[i].getElementsByTagName('td')[1].getElementsByTagName('div').length;
         for(int j=0;j<numbersOfBusesInStandPoint;j++){
-          print((documet.getElementsByTagName('tr')[i].getElementsByTagName('td')[1].getElementsByTagName('div')[j].getElementsByTagName('a')[1].text).replaceAll(new RegExp(r"\s+\b|\b\s"),""));
+          standPoint.addNewBusToList((documet.getElementsByTagName('tr')[i].getElementsByTagName('td')[1].getElementsByTagName('div')[j].getElementsByTagName('a')[1].text).trim());
+          //print((documet.getElementsByTagName('tr')[i].getElementsByTagName('td')[1].getElementsByTagName('div')[j].getElementsByTagName('a')[1].text).replaceAll(new RegExp(r"\s+\b|\b\s"),""));
         }
+//        Why it isnt saving?
+        // get empty collection in the screen
+        // to be look at
+//        print(standPoint.getBusNumbers);
+        busStop.addStandPointToList(standPoint);
       } catch (e){
+        allBusStops.add(busStop);
         busStopNumber++;
       }
     }
-
-    return busStops;
+    return allBusStops;
   }
 
   void parseBusRoute() async{

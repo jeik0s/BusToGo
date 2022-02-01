@@ -1,6 +1,7 @@
+import 'package:bustogo/elements/bus_stop.dart';
 import 'package:flutter/material.dart';
 import 'package:bustogo/services/data_parser.dart';
-
+import 'dart:core';
 
 
 class CityStopsScreen extends StatefulWidget{
@@ -15,6 +16,7 @@ class CityStopsScreen extends StatefulWidget{
 class _CityStopsScreenState extends State<CityStopsScreen>{
 
   List<String> busStopNames = [];
+  List<BusStop> busStops = [];
   int numberOfStops = 0;
 
   String praseCityName(String cityName){
@@ -37,7 +39,10 @@ class _CityStopsScreenState extends State<CityStopsScreen>{
   }
 
   void getBusStopNames(String cityName) async {
-     busStopNames = await DataParser().parseBusStops(praseCityName(cityName));
+     busStops = await DataParser().parseBusStops(praseCityName(cityName));
+     busStops.forEach((stopName) {
+       busStopNames.add(stopName.getName);
+     });
      setState(() {
        busStopNames;
      });
@@ -48,12 +53,13 @@ class _CityStopsScreenState extends State<CityStopsScreen>{
       return Center(child: CircularProgressIndicator());
     } else {
       return ListView.builder(
-        itemCount: busStopNames.length,
+        itemCount: busStops.length,
         itemBuilder: (context, i) {
           return ListTile(
             title: GestureDetector(
               onTap: (){
-                print(busStopNames[i]);
+                BusStop currentBusStop = busStops[i];
+                currentBusStop.printStandPoints();
               },
               child: Text(busStopNames[i]),
             ),
